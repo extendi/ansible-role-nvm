@@ -16,10 +16,6 @@
   ignore_errors: yes
   check_mode: no
 
-- name: debug
-  debug:
-    msg: "{{ extendi_nvm_installed_version }}"
-
 - name: Install specified version of node.js
   shell: ". ~/.nvm/nvm.sh && nvm install {{ extendi_nvm_version }}"
   args:
