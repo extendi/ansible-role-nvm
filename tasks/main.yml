@@ -22,3 +22,24 @@
     executable: /bin/bash
   become: no
   when: "extendi_nvm_installed_version is failed or extendi_nvm_version not in extendi_nvm_installed_version.stdout"
+
+- name: Get username
+  command: whoami
+  become: no
+  register: extendi_username
+  changed_when: false
+  check_mode: no
+
+- name: Create node symlink
+  file:
+    src: "~{{ extendi_username.stdout }}/.nvm/versions/node/v{{extendi_nvm_version}}/bin/node"
+    dest: /usr/local/bin/node
+    state: link
+
+- name: Install nvm packages
+  npm:
+    name: "{{ item }}"
+    global: yes
+    executable: "~/.nvm/versions/node/v{{extendi_nvm_version}}/bin/npm"
+  become: no
+  loop: "{{ extendi_nvm_packages }}"
