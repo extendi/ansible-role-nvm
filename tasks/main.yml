@@ -1,0 +1,28 @@
+---
+- name: install nvm 
+  shell: >
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
+  args:
+    creates: '~/.nvm/nvm.sh'
+  become: no
+
+- name: Get nvm versions list
+  shell: ". ~/.nvm/nvm.sh && node --version"
+  args:
+    executable: /bin/bash
+  register: extendi_nvm_installed_version
+  become: no
+  changed_when: false
+  ignore_errors: yes
+  check_mode: no
+
+- name: debug
+  debug:
+    msg: "{{ extendi_nvm_installed_version }}"
+
+- name: Install specified version of node.js
+  shell: ". ~/.nvm/nvm.sh && nvm install {{ extendi_nvm_version }}"
+  args:
+    executable: /bin/bash
+  become: no
+  when: "extendi_nvm_installed_version is failed or extendi_nvm_version not in extendi_nvm_installed_version.stdout"
