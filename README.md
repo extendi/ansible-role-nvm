@@ -15,6 +15,10 @@ Role Variables
 
 node version to install
 
+    extendi_nvm_user: root
+
+install nvm for this user
+
     extendi_nvm_packages: []
 
 nvm packages to install

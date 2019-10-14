@@ -1,45 +1,45 @@
 ---
-- name: install nvm 
-  shell: >
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
-  args:
-    creates: '~/.nvm/nvm.sh'
-  become: no
+- name: install and configure nvm
+  block:
+    - name: install nvm
+      shell: >
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
+      args:
+        creates: '~/.nvm/nvm.sh'
 
-- name: Get nvm versions list
-  shell: ". ~/.nvm/nvm.sh && node --version"
-  args:
-    executable: /bin/bash
-  register: extendi_nvm_installed_version
-  become: no
-  changed_when: false
-  ignore_errors: yes
-  check_mode: no
+    - name: Get nvm versions list
+      shell: ". ~/.nvm/nvm.sh && node --version"
+      args:
+        executable: /bin/bash
+      register: extendi_nvm_installed_version
+      changed_when: false
+      ignore_errors: yes
+      check_mode: no
 
-- name: Install specified version of node.js
-  shell: ". ~/.nvm/nvm.sh && nvm install {{ extendi_nvm_version }}"
-  args:
-    executable: /bin/bash
-  become: no
-  when: "extendi_nvm_installed_version is failed or extendi_nvm_version not in extendi_nvm_installed_version.stdout"
+    - name: Install specified version of node.js
+      shell: ". ~/.nvm/nvm.sh && nvm install {{ extendi_nvm_version }}"
+      args:
+        executable: /bin/bash
+      when: "extendi_nvm_installed_version is failed or extendi_nvm_version not in extendi_nvm_installed_version.stdout"
 
-- name: Get username
-  command: whoami
-  become: no
-  register: extendi_username
-  changed_when: false
-  check_mode: no
+    - name: Get username
+      command: whoami
+      register: extendi_username
+      changed_when: false
+      check_mode: no
 
-- name: Create node symlink
-  file:
-    src: "~{{ extendi_username.stdout }}/.nvm/versions/node/v{{extendi_nvm_version}}/bin/node"
-    dest: /usr/local/bin/node
-    state: link
+    - name: Create node symlink
+      file:
+        src: "~{{ extendi_username.stdout }}/.nvm/versions/node/v{{extendi_nvm_version}}/bin/node"
+        dest: /usr/local/bin/node
+        state: link
+      become_user: root
 
-- name: Install nvm packages
-  npm:
-    name: "{{ item }}"
-    global: yes
-    executable: "~/.nvm/versions/node/v{{extendi_nvm_version}}/bin/npm"
-  become: no
-  loop: "{{ extendi_nvm_packages }}"
+    - name: Install nvm packages
+      npm:
+        name: "{{ item }}"
+        global: yes
+        executable: "~/.nvm/versions/node/v{{extendi_nvm_version}}/bin/npm"
+      loop: "{{ extendi_nvm_packages }}"
+  become: yes
+  become_user: "{{ extendi_nvm_user }}"
