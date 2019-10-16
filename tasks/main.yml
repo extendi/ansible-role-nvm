@@ -37,9 +37,10 @@
 
     - name: Install nvm packages
       npm:
-        name: "{{ item }}"
+        name: "{{ item.split(':').0 }}"
         global: yes
         executable: "~/.nvm/versions/node/v{{extendi_nvm_version}}/bin/npm"
+        version: "{{ item.split(':').1|default('') }}"
       loop: "{{ extendi_nvm_packages }}"
   become: yes
   become_user: "{{ extendi_nvm_user }}"

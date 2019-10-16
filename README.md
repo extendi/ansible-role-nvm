@@ -21,7 +21,8 @@ install nvm for this user
 
     extendi_nvm_packages: []
 
-nvm packages to install
+nvm packages to install.
+It supports colon syntax to select version to install (e.g. `pm2:2.10.0`)
 
 Dependencies
 ------------
